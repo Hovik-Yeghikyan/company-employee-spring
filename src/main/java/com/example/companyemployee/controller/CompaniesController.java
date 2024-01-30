@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-public class ComaniesController {
+public class CompaniesController {
+
     @Autowired
     private CompanyRepository companyRepository;
 
@@ -21,12 +22,12 @@ public class ComaniesController {
         return "companies";
     }
 
-    @GetMapping("companies/add")
+    @GetMapping("/companies/add")
     public String addCompanyPage() {
         return "addCompany";
     }
 
-    @PostMapping("companies/add")
+    @PostMapping("/companies/add")
     public String addCompany(@ModelAttribute Company company) {
         companyRepository.save(company);
         return "redirect:/companies";
