@@ -3,21 +3,18 @@ package com.example.companyemployee.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Entity
-@Table(name = "company")
+@Table(name = "user")
 @Data
-public class Company {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private String address;
-
-    @OneToMany(mappedBy = "company")
-    private List<Employee> employeeList;
-    @ManyToOne
-    private User user;
+    private String surname;
+    private String email;
+    private String password;
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
 }
