@@ -2,11 +2,10 @@ package com.example.companyemployee.controller;
 
 import com.example.companyemployee.entity.Employee;
 import com.example.companyemployee.repository.CompanyRepository;
-import com.example.companyemployee.repository.EmployeeRepository;
-import com.example.companyemployee.security.SpringUser;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.companyemployee.service.CompanyService;
+import com.example.companyemployee.service.EmployeeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -17,62 +16,46 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class EmployeeController {
-    @Autowired
-    private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final EmployeeService employeeService;
+    private final CompanyService companyService;
 
-    @Value("${picture.upload.directory}")
-    private String uploadDirectory;
 
     @GetMapping("/employees")
     public String employeesPage(ModelMap modelMap) {
-        modelMap.addAttribute("employees", employeeRepository.findAll());
+        modelMap.addAttribute("employees", employeeService.findAll());
         return "employees";
     }
 
     @GetMapping("/employees/add")
     public String addEmployeesPage(ModelMap modelMap) {
-        modelMap.addAttribute("companies", companyRepository.findAll());
+        modelMap.addAttribute("companies", companyService.findAll());
         return "addEmployee";
     }
 
     @PostMapping("/employees/add")
     public String addEmployees(@ModelAttribute Employee employee,
                                @RequestParam("picture") MultipartFile multipartFile) throws IOException {
-        if (multipartFile != null && !multipartFile.isEmpty()) {
-            String picName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
-            File file = new File(uploadDirectory, picName);
-            multipartFile.transferTo(file);
-            employee.setPicName(picName);
-        }
-        employeeRepository.save(employee);
+
+        employeeService.save(employee,multipartFile);
         return "redirect:/employees";
     }
 
     @PostMapping("/employees/update")
     public String updateEmployees(@ModelAttribute Employee employee,
                                   @RequestParam("picture") MultipartFile multipartFile) throws IOException {
-        if (multipartFile != null && !multipartFile.isEmpty()) {
-            String picName = System.currentTimeMillis() + "_" + multipartFile.getOriginalFilename();
-            File file = new File(uploadDirectory, picName);
-            multipartFile.transferTo(file);
-            employee.setPicName(picName);
-        }else {
-            Optional<Employee> fromDB = employeeRepository.findById(employee.getId());
-            employee.setPicName(fromDB.get().getPicName());
-        }
-        employeeRepository.save(employee);
+
+        employeeService.update(employee,multipartFile);
         return "redirect:/employees";
     }
 
     @GetMapping("/employees/update/{id}")
     public String updateEmployeesPage(@PathVariable("id") int id, ModelMap modelMap) {
-        Optional<Employee> byId = employeeRepository.findById(id);
+        Optional<Employee> byId = employeeService.findById(id);
         if (byId.isPresent()) {
-            modelMap.addAttribute("companies", companyRepository.findAll());
+            modelMap.addAttribute("companies", companyService.findAll());
             modelMap.addAttribute("employee", byId.get());
         } else {
             return "redirect:/employees";
@@ -82,23 +65,12 @@ public class EmployeeController {
 
     @GetMapping("/employees/image/delete")
     public String deleteEmployeeImage(@RequestParam("id") int id) {
-        Optional<Employee> byId = employeeRepository.findById(id);
+        Optional<Employee> byId = employeeService.findById(id);
         if (byId.isEmpty()) {
             return "redirect:/employees";
         } else {
-            Employee employee = byId.get();
-            String picName = employee.getPicName();
-            if (picName != null) {
-                employee.setPicName(null);
-                employeeRepository.save(employee);
-                File file = new File(uploadDirectory, picName);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-            return "redirect:/employees/update/" + employee.getId();
+            employeeService.deleteEmployeeImage(id);
+            return "redirect:/employees/update/" + id;
         }
     }
 }
-
-

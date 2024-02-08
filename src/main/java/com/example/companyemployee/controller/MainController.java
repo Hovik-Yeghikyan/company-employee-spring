@@ -27,7 +27,7 @@ public class MainController {
     public    @ResponseBody byte[] getImage(@RequestParam("picName") String picName) throws IOException {
         File file = new File(uploadDirectory, picName);
         if (file.exists()) {
-         return  IOUtils.toByteArray(new FileInputStream(file));
+            return  IOUtils.toByteArray(new FileInputStream(file));
         }
         return null;
     }

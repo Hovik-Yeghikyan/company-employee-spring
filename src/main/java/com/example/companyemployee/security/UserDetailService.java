@@ -2,6 +2,7 @@ package com.example.companyemployee.security;
 
 import com.example.companyemployee.entity.User;
 import com.example.companyemployee.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,16 +14,17 @@ import java.util.Optional;
 
 //@Component
 @Service
+@RequiredArgsConstructor
 public class UserDetailService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> byEmail = userRepository.findByEmail(username);
-if (!byEmail.isPresent()){
-    throw new UsernameNotFoundException("User with " +
-            username + "does not exists");
-}
+        if (!byEmail.isPresent()){
+            throw new UsernameNotFoundException("User with " +
+                    username + "does not exists");
+        }
         return new SpringUser(byEmail.get());
     }
 }

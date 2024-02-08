@@ -12,7 +12,7 @@ public class UserControllerAdvice {
     @ModelAttribute("currentUser")
     public User currentUser(@AuthenticationPrincipal SpringUser springUser){
         if (springUser!=null){
-           return springUser.getUser();
+            return springUser.getUser();
         }
         return null;
     }
