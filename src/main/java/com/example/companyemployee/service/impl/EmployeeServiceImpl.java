@@ -32,8 +32,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             multipartFile.transferTo(file);
             employee.setPicName(picName);
         }
-        employeeRepository.save(employee);
-        return null;
+      return employeeRepository.save(employee);
+
     }
 
     @Override

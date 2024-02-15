@@ -50,8 +50,9 @@ public class UserController {
     public String loginPage(@AuthenticationPrincipal SpringUser springUser) {
         if (springUser == null) {
             return "loginPage";
+        }else {
+            return "redirect:/";
         }
-        return "redirect:/";
     }
 
     @GetMapping("/loginSuccess")
